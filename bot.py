@@ -11,12 +11,10 @@ def home():
     return "Bot is running!"
 
 def run_flask():
-    # Bind to port 10000 (Render expects a port)
     app.run(host="0.0.0.0", port=10000)
 
 # --- Telegram bot setup ---
 def run_bot():
-    # Load token from environment variable
     TOKEN = os.getenv("BOT_TOKEN")
     if not TOKEN:
         raise ValueError("BOT_TOKEN environment variable not set!")
@@ -24,23 +22,25 @@ def run_bot():
     updater = Updater(TOKEN, use_context=True)
     dp = updater.dispatcher
 
-    # /start command
+    # /start command with deep-link payload support
     def start(update, context):
         args = context.args
         if args:
-            update.message.reply_text(f"Started with payload: {args[0]}")
+            payload = args[0]
+            if payload == "NdJn20nOw5dbKNnW":
+                update.message.reply_text("🎉 Welcome via special invite link!")
+            else:
+                update.message.reply_text(f"Started with payload: {payload}")
         else:
             update.message.reply_text("Hello! Bot is alive.")
 
-    # /ping command (silent health check)
+    # /ping command (silent health check for uptime services)
     def ping(update, context):
-        # Respond only to uptime services, not visible to normal users
         update.message.reply_text("pong")
 
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("ping", ping))
 
-    # Start polling Telegram
     print("✅ Bot started successfully and Flask is running")
     updater.start_polling()
     updater.idle()

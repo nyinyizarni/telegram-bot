@@ -1,6 +1,7 @@
 import os
 import threading
 from flask import Flask
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler
 
 # --- Flask setup (keeps Render happy with an open port) ---
@@ -25,12 +26,13 @@ def run_bot():
     # /start command with deep-link payload support
     def start(update, context):
         args = context.args
-        if args:
-            payload = args[0]
-            if payload == "NdJn20nOw5dbKNnW":
-                update.message.reply_text("🎉 Welcome via special invite link!")
-            else:
-                update.message.reply_text(f"Started with payload: {payload}")
+        if args and args[0] == "NdJn20nOw5dbKNnW":
+            # Create a join button
+            keyboard = [
+                [InlineKeyboardButton("Join here", url="https://t.me/+PtEYqHB3wYljMjQ1")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text("🎉 Welcome via special invite link!\nClick below to join:", reply_markup=reply_markup)
         else:
             update.message.reply_text("Hello! Bot is alive.")
 
